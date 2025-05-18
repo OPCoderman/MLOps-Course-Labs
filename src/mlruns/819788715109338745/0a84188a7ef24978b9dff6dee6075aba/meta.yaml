@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/819788715109338745/0a84188a7ef24978b9dff6dee6075aba/artifacts
+end_time: 1747570475105
+entry_point_name: ''
+experiment_id: '819788715109338745'
+lifecycle_stage: active
+run_id: 0a84188a7ef24978b9dff6dee6075aba
+run_name: SVC
+run_uuid: 0a84188a7ef24978b9dff6dee6075aba
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747570461417
+status: 3
+tags: []
+user_id: Legion

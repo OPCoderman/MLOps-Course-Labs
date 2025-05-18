@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/819788715109338745/2b3bb98adb7f48cb85ab26bb9b85620c/artifacts
+end_time: 1747570424270
+entry_point_name: ''
+experiment_id: '819788715109338745'
+lifecycle_stage: active
+run_id: 2b3bb98adb7f48cb85ab26bb9b85620c
+run_name: nebulous-grub-588
+run_uuid: 2b3bb98adb7f48cb85ab26bb9b85620c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747570424124
+status: 3
+tags: []
+user_id: Legion

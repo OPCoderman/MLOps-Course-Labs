@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from sklearn.utils import resample
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import OneHotEncoder,  StandardScaler
 from sklearn.metrics import (
@@ -18,8 +20,11 @@ from sklearn.metrics import (
     confusion_matrix,
     ConfusionMatrixDisplay,
 )
+import joblib
 
 ### Import MLflow
+import mlflow
+from mlflow.models.signature import infer_signature
 
 def rebalance(data):
     """
@@ -90,7 +95,6 @@ def preprocess(df):
     data_bal = rebalance(data=data)
     X = data_bal.drop("Exited", axis=1)
     y = data_bal["Exited"]
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=1912
     )
@@ -107,7 +111,8 @@ def preprocess(df):
     X_test = pd.DataFrame(X_test, columns=col_transf.get_feature_names_out())
 
     # Log the transformer as an artifact
-
+    joblib.dump(col_transf, "column_transformer.joblib") 
+    mlflow.log_artifact("column_transformer.joblib")
     return col_transf, X_train, X_test, y_train, y_test
 
 
@@ -127,49 +132,91 @@ def train(X_train, y_train):
 
     ### Log the model with the input and output schema
     # Infer signature (input and output schema)
-
+    signature = infer_signature(X_train, log_reg.predict(X_train))
     # Log model
-
+    mlflow.sklearn.log_model(log_reg, "logistic_regression_model", signature=signature)
     ### Log the data
-
+    train_data = pd.concat([X_train, y_train.reset_index(drop=True)], axis=1)
+    train_data.to_csv(r"C:\MLOPS\MLOps-Course-Labs\dataset\train_data.csv", index=False)
+    mlflow.log_artifact(r"C:\MLOPS\MLOps-Course-Labs\dataset\train_data.csv")
     return log_reg
 
 
 def main():
     ### Set the tracking URI for MLflow
-
+    mlflow.set_tracking_uri("http://localhost:5000")
     ### Set the experiment name
+    mlflow.set_experiment("Churn_Prediction_Experiment")
 
-
-    ### Start a new run and leave all the main function code as part of the experiment
-
-    df = pd.read_csv("data/Churn_Modelling.csv")
+    df = pd.read_csv(r"C:\MLOPS\MLOps-Course-Labs\dataset\Churn_Modelling.csv")
     col_transf, X_train, X_test, y_train, y_test = preprocess(df)
 
-    ### Log the max_iter parameter
+    # 1. Logistic Regression
+    if mlflow.active_run() is not None:
+       mlflow.end_run()
 
-    model = train(X_train, y_train)
+    with mlflow.start_run(run_name="Logistic Regression"):
+        mlflow.log_param("max_iter", 1000)
+        model = LogisticRegression(max_iter=1000)
+        model.fit(X_train, y_train)
+        signature = infer_signature(X_train, model.predict(X_train))
+        mlflow.sklearn.log_model(model, "model", signature=signature)
+        y_pred = model.predict(X_test)
+        mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
+        mlflow.log_metric("precision", precision_score(y_test, y_pred))
+        mlflow.log_metric("recall", recall_score(y_test, y_pred))
+        mlflow.log_metric("f1_score", f1_score(y_test, y_pred))
+        mlflow.set_tag("model", "Logistic Regression")
+        plt.figure()
+        conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        ConfusionMatrixDisplay(conf_mat, display_labels=model.classes_).plot()
+        plt.savefig("confusion_matrix_lr.png")
+        mlflow.log_artifact("confusion_matrix_lr.png")
+        plt.close()
 
-    
-    y_pred = model.predict(X_test)
+    # 2. Random Forest
+    if mlflow.active_run() is not None:
+       mlflow.end_run()
 
-    ### Log metrics after calculating them
+    with mlflow.start_run(run_name="Random Forest"):
+        model = RandomForestClassifier(n_estimators=100)
+        model.fit(X_train, y_train)
+        signature = infer_signature(X_train, model.predict(X_train))
+        mlflow.sklearn.log_model(model, "model", signature=signature)
+        y_pred = model.predict(X_test)
+        mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
+        mlflow.log_metric("precision", precision_score(y_test, y_pred))
+        mlflow.log_metric("recall", recall_score(y_test, y_pred))
+        mlflow.log_metric("f1_score", f1_score(y_test, y_pred))
+        mlflow.set_tag("model", "Random Forest")
+        plt.figure()
+        conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        ConfusionMatrixDisplay(conf_mat, display_labels=model.classes_).plot()
+        plt.savefig("confusion_matrix_rf.png")
+        mlflow.log_artifact("confusion_matrix_rf.png")
+        plt.close()
 
+    # 3. Support Vector Classifier
+    if mlflow.active_run() is not None:
+       mlflow.end_run()
 
-    ### Log tag
-
-
-    
-    conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
-    conf_mat_disp = ConfusionMatrixDisplay(
-        confusion_matrix=conf_mat, display_labels=model.classes_
-    )
-    conf_mat_disp.plot()
-    
-    # Log the image as an artifact in MLflow
-    
-    plt.show()
-
+    with mlflow.start_run(run_name="SVC"):
+        model = SVC(probability=True)
+        model.fit(X_train, y_train)
+        signature = infer_signature(X_train, model.predict(X_train))
+        mlflow.sklearn.log_model(model, "model", signature=signature)
+        y_pred = model.predict(X_test)
+        mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
+        mlflow.log_metric("precision", precision_score(y_test, y_pred))
+        mlflow.log_metric("recall", recall_score(y_test, y_pred))
+        mlflow.log_metric("f1_score", f1_score(y_test, y_pred))
+        mlflow.set_tag("model", "SVC")
+        plt.figure()
+        conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        ConfusionMatrixDisplay(conf_mat, display_labels=model.classes_).plot()
+        plt.savefig("confusion_matrix_svc.png")
+        mlflow.log_artifact("confusion_matrix_svc.png")
+        plt.close()
 
 if __name__ == "__main__":
     main()

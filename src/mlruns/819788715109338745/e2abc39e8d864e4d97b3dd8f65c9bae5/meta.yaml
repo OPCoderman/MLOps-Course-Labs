@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/819788715109338745/e2abc39e8d864e4d97b3dd8f65c9bae5/artifacts
+end_time: 1747569675439
+entry_point_name: ''
+experiment_id: '819788715109338745'
+lifecycle_stage: active
+run_id: e2abc39e8d864e4d97b3dd8f65c9bae5
+run_name: caring-crow-582
+run_uuid: e2abc39e8d864e4d97b3dd8f65c9bae5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747569670324
+status: 3
+tags: []
+user_id: Legion

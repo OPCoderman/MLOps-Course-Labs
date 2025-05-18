@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/819788715109338745/fd7def00b26c406494c791062ba74973/artifacts
+end_time: 1747569628196
+entry_point_name: ''
+experiment_id: '819788715109338745'
+lifecycle_stage: active
+run_id: fd7def00b26c406494c791062ba74973
+run_name: burly-ram-635
+run_uuid: fd7def00b26c406494c791062ba74973
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747569616713
+status: 4
+tags: []
+user_id: Legion
