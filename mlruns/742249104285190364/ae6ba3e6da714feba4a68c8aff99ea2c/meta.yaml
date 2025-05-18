@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/742249104285190364/ae6ba3e6da714feba4a68c8aff99ea2c/artifacts
+end_time: 1747567939894
+entry_point_name: ''
+experiment_id: '742249104285190364'
+lifecycle_stage: active
+run_id: ae6ba3e6da714feba4a68c8aff99ea2c
+run_name: unequaled-croc-483
+run_uuid: ae6ba3e6da714feba4a68c8aff99ea2c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747567939827
+status: 4
+tags: []
+user_id: Legion

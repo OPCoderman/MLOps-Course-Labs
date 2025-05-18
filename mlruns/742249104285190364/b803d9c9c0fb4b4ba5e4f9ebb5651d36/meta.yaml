@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/742249104285190364/b803d9c9c0fb4b4ba5e4f9ebb5651d36/artifacts
+end_time: 1747568148705
+entry_point_name: ''
+experiment_id: '742249104285190364'
+lifecycle_stage: active
+run_id: b803d9c9c0fb4b4ba5e4f9ebb5651d36
+run_name: incongruous-gull-546
+run_uuid: b803d9c9c0fb4b4ba5e4f9ebb5651d36
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747568148650
+status: 4
+tags: []
+user_id: Legion
