@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/742249104285190364/2e7a123dc2f342faaa85e91b21f91fc2/artifacts
+end_time: 1747637018565
+entry_point_name: ''
+experiment_id: '742249104285190364'
+lifecycle_stage: active
+run_id: 2e7a123dc2f342faaa85e91b21f91fc2
+run_name: Logistic Regression
+run_uuid: 2e7a123dc2f342faaa85e91b21f91fc2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747637003782
+status: 3
+tags: []
+user_id: Legion
