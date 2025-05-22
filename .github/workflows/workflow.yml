@@ -3,7 +3,7 @@ name: Deploy to AWS EC2
 on:
   push:
     branches:
-      - main
+      - main   # change this to your branch, e.g. feature/api or main
 
 env:
   AWS_REGION: us-east-1
@@ -19,10 +19,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Python
+    - name: Set up Python 3.12
       uses: actions/setup-python@v4
       with:
-        python-version: '3.12'
+        python-version: 3.12
 
     - name: Install dependencies
       run: pip install -r requirements.txt
@@ -72,7 +72,8 @@ jobs:
 
           cd MLOps-Course-Labs
 
-          sed -i 's|image: .*|image: git add .'"${{ env.IMAGE_URI }}:${{ env.IMAGE_TAG }}"'|' docker-compose.yml
+          # Update image in docker-compose.yml to the pushed ECR image
+          sed -i 's|image: .*|image: '"${{ env.IMAGE_URI }}:${{ env.IMAGE_TAG }}"'|' docker-compose.yml
 
           docker-compose down || true
           docker-compose up -d --build
