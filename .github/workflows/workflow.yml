@@ -19,15 +19,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run unit tests
+      run: pytest
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
-
-    - name: Run unit tests
-      run: pytest
 
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v1
@@ -64,7 +72,7 @@ jobs:
 
           cd MLOps-Course-Labs
 
-          sed -i 's|image: .*|image: '"${{ env.IMAGE_URI }}:${{ env.IMAGE_TAG }}"'|' docker-compose.yml
+          sed -i 's|image: .*|image: git add .'"${{ env.IMAGE_URI }}:${{ env.IMAGE_TAG }}"'|' docker-compose.yml
 
           docker-compose down || true
           docker-compose up -d --build
