@@ -3,7 +3,7 @@ name: Deploy to AWS EC2
 on:
   push:
     branches:
-      - main   # change this to your branch, e.g. feature/api or main
+      - main  # Trigger only on main branch pushes
 
 env:
   AWS_REGION: us-east-1
@@ -48,11 +48,11 @@ jobs:
           --query 'repositories[0].repositoryUri' \
           --output text)
 
+        echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
         docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
         docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI:$IMAGE_TAG
         docker push $IMAGE_URI:$IMAGE_TAG
-
-        echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
     - name: SSH and deploy on EC2
       uses: appleboy/ssh-action@v0.1.7
@@ -60,6 +60,7 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
+        envs: IMAGE_URI,IMAGE_TAG
         script: |
           sudo yum install -y git docker
           sudo systemctl start docker
@@ -72,8 +73,8 @@ jobs:
 
           cd MLOps-Course-Labs
 
-          # Update image in docker-compose.yml to the pushed ECR image
-          sed -i 's|image: .*|image: '"${{ env.IMAGE_URI }}:${{ env.IMAGE_TAG }}"'|' docker-compose.yml
+          sed -i "s|image: .*|image: ${IMAGE_URI}:${IMAGE_TAG}|" docker-compose.yml
 
           docker-compose down || true
           docker-compose up -d --build
+
