@@ -26,6 +26,11 @@ jobs:
 
     - name: Install dependencies
       run: pip install -r requirements.txt
+    - name: Check files in repo root
+      run: |
+        pwd
+        ls -la
+        ls -la tests
 
     
     - name: Run unit tests
