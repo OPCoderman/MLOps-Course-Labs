@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
-    - name: Run unit tests
+    - name: Run tests
       run: pytest
 
     - name: Configure AWS credentials
