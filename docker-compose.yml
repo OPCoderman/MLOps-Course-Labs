@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: churn-prediction:seif_khalil-662
     container_name: fastapi
     ports:
       - "8000:8000"
