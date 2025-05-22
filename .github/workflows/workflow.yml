@@ -34,7 +34,9 @@ jobs:
 
     
     - name: Run unit tests
+      working-directory: ./MLOps-Course-Labs
       run: pytest -v tests/
+
 
 
     - name: Configure AWS credentials
