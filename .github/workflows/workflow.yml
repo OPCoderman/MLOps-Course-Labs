@@ -1,0 +1,70 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - feature/api
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: churn-prediction
+  IMAGE_TAG: seif_khalil-662
+  GITHUB_REPO: https://github.com/OPCoderman/MLOps-Course-Labs.git
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Run unit tests
+      run: pytest
+
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push Docker image to ECR
+      run: |
+        IMAGE_URI=$(aws ecr describe-repositories \
+          --repository-names $ECR_REPOSITORY \
+          --region $AWS_REGION \
+          --query 'repositories[0].repositoryUri' \
+          --output text)
+
+        docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI:$IMAGE_TAG
+        docker push $IMAGE_URI:$IMAGE_TAG
+
+        echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
+    - name: SSH and deploy on EC2
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          sudo yum install -y git docker
+          sudo systemctl start docker
+
+          if [ ! -d MLOps-Course-Labs ]; then
+            git clone ${{ env.GITHUB_REPO }}
+          else
+            cd MLOps-Course-Labs && git pull
+          fi
+
+          cd MLOps-Course-Labs
+
+          sed -i 's|image: .*|image: '"${{ env.IMAGE_URI }}:${{ env.IMAGE_TAG }}"'|' docker-compose.yml
+
+          docker-compose down || true
+          docker-compose up -d --build
